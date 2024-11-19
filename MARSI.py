@@ -1,12 +1,10 @@
 import os
 import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Application, CommandHandler
 from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
-from datetime import timedelta
 import pytz
 import sys
 from io import StringIO
@@ -152,20 +150,18 @@ def fetch_and_send_data(update, context):
 # Main function to set up the bot
 def main():
     try:
-        # Set up the Updater
-        updater = Updater(token=TELEGRAM_API_TOKEN, use_context=True)
+        # Set up the Application instance
+        application = Application.builder().token(TELEGRAM_API_TOKEN).build()
 
         # Get the dispatcher to register handlers
-        dispatcher = updater.dispatcher
+        dispatcher = application.dispatcher
 
         # Register the /run command
         dispatcher.add_handler(CommandHandler('run', fetch_and_send_data))
 
         # Start polling
-        updater.start_polling()
+        application.run_polling()
 
-        # Run the bot until interrupted
-        updater.idle()
     except telegram.error.Conflict:
         print("Error: Another instance of the bot is running.")
     except Exception as e:
@@ -173,6 +169,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
