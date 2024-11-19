@@ -1,5 +1,6 @@
 import os
 import telegram
+from telegram.ext import Updater, CommandHandler
 from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
@@ -10,8 +11,6 @@ import pytz
 import sys
 from io import StringIO
 import asyncio
-from telegram import Update
-from telegram.ext import Application, CommandHandler
 
 # Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
@@ -42,7 +41,6 @@ data.reset_index(inplace=True)
 data['datetime'] = pd.to_datetime(data['datetime']).dt.tz_localize(None)
 
 # Feature Engineering
-data.loc[:, 'datetime'] = pd.to_datetime(data['datetime'])
 data['EMA'] = data['close'].ewm(span=20, adjust=False).mean()
 data['EMAResult'] = data.apply(lambda row: 1 if row['open'] > row['EMA'] else 0, axis=1)
 data['SMA'] = data['open'].rolling(window=192).mean()
@@ -131,7 +129,6 @@ sys.stdout = new_stdout
 
 # Now, any print statement will go into new_stdout
 print(f"The best value for RSI {target_rsi} is: {round(best_value)}")
-print()
 print(f"Latest RSI: {round(data['RSI'].iloc[-1], 1)}")
 print(f"Latest Time: {data['LocalTime'].iloc[-1]}")
 print(f"Latest Price: {round(data['close'].iloc[-1])}")
@@ -143,40 +140,37 @@ output = new_stdout.getvalue()
 # Reset the standard output to original
 sys.stdout = old_stdout
 
-# Send the captured output to Telegram
-asyncio.run(send_message(output))
+# Telegram bot command handler for /run
+async def fetch_and_send_data(update, context):
+    message = f"""
+    The best value for RSI {target_rsi} is: {round(best_value, 0)}
+    Latest RSI: {round(data['RSI'].iloc[-1], 1)}
+    Latest Time: {data['LocalTime'].iloc[-1]}
+    Latest Price: {round(data['close'].iloc[-1], 0)}
+    Difference: {round(best_value - data['close'].iloc[-1], 0)}
+    """
+    await send_message(message)
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Bot Command Handler
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Set up the Telegram bot with the /run command handler
+def main():
+    # Set up the Updater
+    updater = Updater(TELEGRAM_API_TOKEN, use_context=True)
 
-# Command function
-async def run(update: Update, context: telegram.ext.CallbackContext):
-    # Run the function when /run is called
-    old_stdout = sys.stdout
-    new_stdout = StringIO()
-    sys.stdout = new_stdout
-    print("Running bot command...")
+    # Get the dispatcher to register handlers
+    dispatcher = updater.dispatcher
 
-    # Your trading strategy and calculations go here (can be the code from above)
+    # Register the /run command
+    dispatcher.add_handler(CommandHandler('run', fetch_and_send_data))
 
-    output = new_stdout.getvalue()
-    await update.message.reply_text(output)
+    # Start the bot
+    updater.start_polling()
 
-# Main entry point for the bot
-async def main():
-    # Create the application instance
-    application = Application.builder().token(TELEGRAM_API_TOKEN).build()
+    # Run the bot until you send a signal to stop
+    updater.idle()
 
-    # Add command handler for /run
-    application.add_handler(CommandHandler("run", run))
-
-    # Start the bot and listen for commands
-    await application.run_polling()
-
-# Run the bot in an already running event loop
 if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(main())
+    main()
+
 
 
 
