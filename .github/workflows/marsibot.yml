@@ -24,9 +24,11 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install yfinance pandas numpy scikit-learn matplotlib pytz
+          pip install --upgrade --no-cache-dir git+https://github.com/rongardF/tvdatafeed.git
 
-      # Step 4: Run the bot script
+      # Step 4: Run the MARSI bot
       - name: Run the MARSI bot
         run: |
           python main.py
+
