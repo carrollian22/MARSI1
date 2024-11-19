@@ -20,7 +20,6 @@ tv = TvDatafeed()
 # Data and Feature Engineering
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import yfinance as yf
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
