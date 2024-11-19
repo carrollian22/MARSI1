@@ -134,7 +134,6 @@ print(f"The best value for RSI {target_rsi} is: {round(best_value)}")
 print()
 print(f"Latest RSI: {round(data['RSI'].iloc[-1], 1)}")
 print(f"Latest Time: {data['LocalTime'].iloc[-1]}")
-print()
 print(f"Latest Price: {round(data['close'].iloc[-1])}")
 print(f"Difference: {round(best_value - data['close'].iloc[-1])}")
 
@@ -175,9 +174,10 @@ async def main():
     # Start the bot and listen for commands
     await application.run_polling()
 
-# Run the bot
+# Run the bot in an already running event loop
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.get_event_loop().run_until_complete(main())
+
 
 
 
