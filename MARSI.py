@@ -7,6 +7,9 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from datetime import timedelta
 import pytz
+import sys
+from io import StringIO
+import asyncio
 
 # Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
@@ -15,8 +18,8 @@ CHAT_ID = '8078910487'  # Replace this with your chat ID or use @username format
 bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
 
 # Send message function
-def send_message(message):
-    bot.send_message(chat_id=CHAT_ID, text=message)
+async def send_message(message):
+    await bot.send_message(chat_id=CHAT_ID, text=message)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import TVDataFeed Package
@@ -119,15 +122,25 @@ for value in range_of_values:
         min_diff = diff
         best_value = value
 
-# Prepare message to send to Telegram
-message = f"""
-The best value for RSI {target_rsi} is: {best_value}
-Latest RSI: {data['RSI'].iloc[-1]}
-Latest Time: {data['LocalTime'].iloc[-1]}
-Latest Price: {data['close'].iloc[-1]}
-Difference between Latest Price and Best Value: {data['close'].iloc[-1] - best_value}
-"""
+# Capture the print outputs
+old_stdout = sys.stdout
+new_stdout = StringIO()
+sys.stdout = new_stdout
 
-# Send the message to Telegram
-send_message(message)
+# Now, any print statement will go into new_stdout
+print(f"The best value for RSI {target_rsi} is: {best_value}")
+print(f"Latest RSI: {data['RSI'].iloc[-1]}")
+print(f"Latest Time: {data['LocalTime'].iloc[-1]}")
+print(f"Latest Price: {data['close'].iloc[-1]}")
+print(f"Difference between Latest Price and Best Value: {data['close'].iloc[-1] - best_value}")
+
+# Capture the output
+output = new_stdout.getvalue()
+
+# Reset the standard output to original
+sys.stdout = old_stdout
+
+# Send the captured output to Telegram
+asyncio.run(send_message(output))
+
 
