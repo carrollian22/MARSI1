@@ -13,7 +13,7 @@ import pytz
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
 CHAT_ID = 'YOUR_CHAT_ID'  # Replace this with your chat ID or use @username format for the bot to message you
 
-bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
+bot = telegram.Bot(token=Telegram_API_Token)
 
 # Send message function
 def send_message(message):
