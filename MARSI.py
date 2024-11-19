@@ -137,7 +137,7 @@ output = new_stdout.getvalue()
 sys.stdout = old_stdout
 
 # Telegram bot command handler for /run
-def fetch_and_send_data(update, context):
+async def fetch_and_send_data(update, context):
     message = f"""
     The best value for RSI {target_rsi} is: {round(best_value, 0)}
     Latest RSI: {round(data['RSI'].iloc[-1], 1)}
@@ -153,11 +153,8 @@ def main():
         # Set up the Application instance
         application = Application.builder().token(TELEGRAM_API_TOKEN).build()
 
-        # Get the dispatcher to register handlers
-        dispatcher = application.dispatcher
-
         # Register the /run command
-        dispatcher.add_handler(CommandHandler('run', fetch_and_send_data))
+        application.add_handler(CommandHandler("run", fetch_and_send_data))
 
         # Start polling
         application.run_polling()
@@ -169,6 +166,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
