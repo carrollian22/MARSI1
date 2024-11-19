@@ -10,7 +10,6 @@ Original file is located at
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import TVDataFeed Package
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-pip install --upgrade --no-cache-dir git+https://github.com/rongardF/tvdatafeed.git
 
 from tvDatafeed import TvDatafeed, Interval
 
