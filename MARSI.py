@@ -11,7 +11,7 @@ import pytz
 
 # Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
-CHAT_ID = 'YOUR_CHAT_ID'  # Replace this with your chat ID or use @username format for the bot to message you
+CHAT_ID = '8078910487'  # Replace this with your chat ID or use @username format for the bot to message you
 
 bot = telegram.Bot(token=Telegram_API_Token)
 
