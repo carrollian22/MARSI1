@@ -1,6 +1,6 @@
 import os
 import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Application, CommandHandler
 from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
@@ -10,16 +10,14 @@ from datetime import timedelta
 import pytz
 import sys
 from io import StringIO
-import asyncio
 
-# Initialize Telegram Bot
+# Telegram API Token and Chat ID
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
 CHAT_ID = '8078910487'  # Replace this with your chat ID or use @username format for the bot to message you
 
-bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
-
 # Send message function
 async def send_message(message):
+    bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
     await bot.send_message(chat_id=CHAT_ID, text=message)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,7 +93,7 @@ def calculate_rsi_with_16th_value(last_15_open_values, value, window_length=16):
     return rsi
 
 # Define last 15 values and compute target range for RSI
-last_15_open_values = data['open'].iloc[-100:].values  # Get More Values since EWM needs a bigger window in lead up.
+last_15_open_values = data['open'].iloc[-100:].values  # Get more values since EWM needs a bigger window in lead up.
 last_open = last_15_open_values[-1]
 
 if data['SMASlopeResult'].iloc[-1] > 0:
@@ -103,11 +101,11 @@ if data['SMASlopeResult'].iloc[-1] > 0:
     range_end = last_open
     target_rsi = 32.5
 else:
-    range_start = last_open * .98
+    range_start = last_open * 0.98
     range_end = last_open * 1.08
     target_rsi = 67.5
 
-range_of_values = np.linspace(range_start, range_end, 400)  # Create 40 steps
+range_of_values = np.linspace(range_start, range_end, 400)  # Create 400 steps
 
 best_value = None
 min_diff = float('inf')
@@ -151,22 +149,16 @@ async def fetch_and_send_data(update, context):
     """
     await send_message(message)
 
-# Set up the Telegram bot with the /run command handler
+# Main function to set up the bot
 def main():
-    # Set up the Updater
-    updater = Updater(TELEGRAM_API_TOKEN, use_context=True)
+    # Set up the Application
+    application = Application.builder().token(TELEGRAM_API_TOKEN).build()
 
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
-
-    # Register the /run command
-    dispatcher.add_handler(CommandHandler('run', fetch_and_send_data))
+    # Register the /run command handler
+    application.add_handler(CommandHandler('run', fetch_and_send_data))
 
     # Start the bot
-    updater.start_polling()
-
-    # Run the bot until you send a signal to stop
-    updater.idle()
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
