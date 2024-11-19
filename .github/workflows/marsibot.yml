@@ -27,8 +27,9 @@ jobs:
           pip install yfinance pandas numpy scikit-learn matplotlib pytz
           pip install --upgrade --no-cache-dir git+https://github.com/rongardF/tvdatafeed.git
 
-      # Step 4: Run the MARSI bot
+      # Step 4: Run the MARSI bot (use correct file name)
       - name: Run the MARSI bot
         run: |
-          python main.py
+          python MARSI.py
+
 
