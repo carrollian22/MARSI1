@@ -1,7 +1,6 @@
 import os
 import telegram
 from tvDatafeed import TvDatafeed, Interval
-import yfinance as yf
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
