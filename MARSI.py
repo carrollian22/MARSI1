@@ -1,5 +1,6 @@
 import os
 import telegram
+from telegram.ext import Updater, CommandHandler
 from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
@@ -26,7 +27,7 @@ async def send_message(message):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tv = TvDatafeed()
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 # Data and Feature Engineering
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -40,7 +41,6 @@ data.reset_index(inplace=True)
 data['datetime'] = pd.to_datetime(data['datetime']).dt.tz_localize(None)
 
 # Feature Engineering
-data.loc[:, 'datetime'] = pd.to_datetime(data['datetime'])
 data['EMA'] = data['close'].ewm(span=20, adjust=False).mean()
 data['EMAResult'] = data.apply(lambda row: 1 if row['open'] > row['EMA'] else 0, axis=1)
 data['SMA'] = data['open'].rolling(window=192).mean()
@@ -132,6 +132,7 @@ print(f"The best value for RSI {target_rsi} is: {round(best_value)}")
 print()
 print(f"Latest RSI: {round(data['RSI'].iloc[-1], 1)}")
 print(f"Latest Time: {data['LocalTime'].iloc[-1]}")
+print()
 print(f"Latest Price: {round(data['close'].iloc[-1])}")
 print(f"Difference: {round(best_value - data['close'].iloc[-1])}")
 
@@ -141,7 +142,36 @@ output = new_stdout.getvalue()
 # Reset the standard output to original
 sys.stdout = old_stdout
 
-# Send the captured output to Telegram
-asyncio.run(send_message(output))
+# Telegram bot command handler for /run
+async def fetch_and_send_data(update, context):
+    message = f"""
+    The best value for RSI {target_rsi} is: {round(best_value, 0)}
+    Latest RSI: {round(data['RSI'].iloc[-1], 1)}
+    Latest Time: {data['LocalTime'].iloc[-1]}
+    Latest Price: {round(data['close'].iloc[-1], 0)}
+    Difference: {round(best_value - data['close'].iloc[-1], 0)}
+    """
+    await send_message(message)
+
+# Set up the Telegram bot with the /run command handler
+def main():
+    # Set up the Updater
+    updater = Updater(TELEGRAM_API_TOKEN, use_context=True)
+
+    # Get the dispatcher to register handlers
+    dispatcher = updater.dispatcher
+
+    # Register the /run command
+    dispatcher.add_handler(CommandHandler('run', fetch_and_send_data))
+
+    # Start the bot
+    updater.start_polling()
+
+    # Run the bot until you send a signal to stop
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
+
 
 
