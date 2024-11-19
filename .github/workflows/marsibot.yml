@@ -28,13 +28,12 @@ jobs:
           pip install python-telegram-bot
           pip install --upgrade --no-cache-dir git+https://github.com/rongardF/tvdatafeed.git
 
-      - name: Run the script
+      # Step 4: Run the script
+      - name: Run the MARSI bot
         env:
           TELEGRAM_API_TOKEN: ${{ secrets.Telegram_API_Token }}
-
-      # Step 4: Run the MARSI bot (use correct file name)
-      - name: Run the MARSI bot
         run: |
           python MARSI.py
+
 
 
