@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pandas numpy scikit-learn matplotlib pytz
+          pip install python-telegram-bot
           pip install --upgrade --no-cache-dir git+https://github.com/rongardF/tvdatafeed.git
 
       # Step 4: Run the MARSI bot (use correct file name)
