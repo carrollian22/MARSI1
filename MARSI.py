@@ -1,6 +1,6 @@
 import os
 import telegram
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Updater, CommandHandler
 from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
@@ -10,32 +10,32 @@ from datetime import timedelta
 import pytz
 import sys
 from io import StringIO
+import logging
 
-# Telegram API Token and Chat ID
+# Set up logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
+
+# Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
 CHAT_ID = '8078910487'  # Replace this with your chat ID or use @username format for the bot to message you
 
+bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
+
 # Send message function
-async def send_message(message):
-    bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
-    await bot.send_message(chat_id=CHAT_ID, text=message)
+def send_message(message):
+    bot.send_message(chat_id=CHAT_ID, text=message)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import TVDataFeed Package
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tv = TvDatafeed()
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-# Data and Feature Engineering
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 # Fetch data
 data = tv.get_hist(symbol='BTCUSDT.P', exchange='MEXC', interval=Interval.in_15_minute, n_bars=5000)
-
-# Reset the index to make 'time' a regular column if it was previously the index
-data.reset_index(inplace=True)
-
-# Join Data
+data.reset_index(inplace=True)  # Reset index for convenience
 data['datetime'] = pd.to_datetime(data['datetime']).dt.tz_localize(None)
 
 # Feature Engineering
@@ -46,7 +46,7 @@ data['SMASlope'] = (data['SMA'] - data['SMA'].shift(8)) / 8
 data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 3 else (-1 if x < -3 else 0))
 data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(8)) / data['SMA'].shift(8)) * 25
 
-# RSI
+# RSI Calculation
 window_length = 16
 delta = data['open'].diff()
 gain = delta.where(delta > 0, 0)
@@ -93,7 +93,7 @@ def calculate_rsi_with_16th_value(last_15_open_values, value, window_length=16):
     return rsi
 
 # Define last 15 values and compute target range for RSI
-last_15_open_values = data['open'].iloc[-100:].values  # Get more values since EWM needs a bigger window in lead up.
+last_15_open_values = data['open'].iloc[-100:].values  # Get More Values since EWM needs a bigger window in lead up.
 last_open = last_15_open_values[-1]
 
 if data['SMASlopeResult'].iloc[-1] > 0:
@@ -101,11 +101,11 @@ if data['SMASlopeResult'].iloc[-1] > 0:
     range_end = last_open
     target_rsi = 32.5
 else:
-    range_start = last_open * 0.98
+    range_start = last_open * .98
     range_end = last_open * 1.08
     target_rsi = 67.5
 
-range_of_values = np.linspace(range_start, range_end, 400)  # Create 400 steps
+range_of_values = np.linspace(range_start, range_end, 400)  # Create 40 steps
 
 best_value = None
 min_diff = float('inf')
@@ -139,7 +139,7 @@ output = new_stdout.getvalue()
 sys.stdout = old_stdout
 
 # Telegram bot command handler for /run
-async def fetch_and_send_data(update, context):
+def fetch_and_send_data(update, context):
     message = f"""
     The best value for RSI {target_rsi} is: {round(best_value, 0)}
     Latest RSI: {round(data['RSI'].iloc[-1], 1)}
@@ -147,21 +147,33 @@ async def fetch_and_send_data(update, context):
     Latest Price: {round(data['close'].iloc[-1], 0)}
     Difference: {round(best_value - data['close'].iloc[-1], 0)}
     """
-    await send_message(message)
+    send_message(message)
 
 # Main function to set up the bot
 def main():
-    # Set up the Application
-    application = Application.builder().token(TELEGRAM_API_TOKEN).build()
+    try:
+        # Set up the Updater
+        updater = Updater(token=TELEGRAM_API_TOKEN, use_context=True)
 
-    # Register the /run command handler
-    application.add_handler(CommandHandler('run', fetch_and_send_data))
+        # Get the dispatcher to register handlers
+        dispatcher = updater.dispatcher
 
-    # Start the bot
-    application.run_polling()
+        # Register the /run command
+        dispatcher.add_handler(CommandHandler('run', fetch_and_send_data))
+
+        # Start polling
+        updater.start_polling()
+
+        # Run the bot until interrupted
+        updater.idle()
+    except telegram.error.Conflict:
+        print("Error: Another instance of the bot is running.")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
 
 if __name__ == '__main__':
     main()
+
 
 
 
