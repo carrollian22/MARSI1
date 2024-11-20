@@ -128,11 +128,12 @@ new_stdout = StringIO()
 sys.stdout = new_stdout
 
 # Now, any print statement will go into new_stdout
-print(f"The best value for RSI {target_rsi} is: {best_value}")
-print(f"Latest RSI: {data['RSI'].iloc[-1]}")
+print(f"The best value for RSI {target_rsi} is: {round(best_value)}")
+print()
+print(f"Latest RSI: {round(data['RSI'].iloc[-1], 1)}")
 print(f"Latest Time: {data['LocalTime'].iloc[-1]}")
-print(f"Latest Price: {data['close'].iloc[-1]}")
-print(f"Difference between Latest Price and Best Value: {data['close'].iloc[-1] - best_value}")
+print(f"Latest Price: {round(data['close'].iloc[-1])}")
+print(f"Difference: {round(best_value - data['close'].iloc[-1])}")
 
 # Capture the output
 output = new_stdout.getvalue()
