@@ -1,20 +1,15 @@
 import os
 import telegram
-from telegram.ext import Application, CommandHandler
 from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
+from datetime import timedelta
 import pytz
 import sys
 from io import StringIO
-import logging
-
-# Set up logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-)
+import asyncio
 
 # Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
@@ -23,20 +18,29 @@ CHAT_ID = '8078910487'  # Replace this with your chat ID or use @username format
 bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
 
 # Send message function
-def send_message(message):
-    bot.send_message(chat_id=CHAT_ID, text=message)
+async def send_message(message):
+    await bot.send_message(chat_id=CHAT_ID, text=message)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import TVDataFeed Package
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tv = TvDatafeed()
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Data and Feature Engineering
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # Fetch data
 data = tv.get_hist(symbol='BTCUSDT.P', exchange='MEXC', interval=Interval.in_15_minute, n_bars=5000)
-data.reset_index(inplace=True)  # Reset index for convenience
+
+# Reset the index to make 'time' a regular column if it was previously the index
+data.reset_index(inplace=True)
+
+# Join Data
 data['datetime'] = pd.to_datetime(data['datetime']).dt.tz_localize(None)
 
 # Feature Engineering
+data.loc[:, 'datetime'] = pd.to_datetime(data['datetime'])
 data['EMA'] = data['close'].ewm(span=20, adjust=False).mean()
 data['EMAResult'] = data.apply(lambda row: 1 if row['open'] > row['EMA'] else 0, axis=1)
 data['SMA'] = data['open'].rolling(window=192).mean()
@@ -44,7 +48,7 @@ data['SMASlope'] = (data['SMA'] - data['SMA'].shift(8)) / 8
 data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 3 else (-1 if x < -3 else 0))
 data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(8)) / data['SMA'].shift(8)) * 25
 
-# RSI Calculation
+# RSI
 window_length = 16
 delta = data['open'].diff()
 gain = delta.where(delta > 0, 0)
@@ -124,11 +128,11 @@ new_stdout = StringIO()
 sys.stdout = new_stdout
 
 # Now, any print statement will go into new_stdout
-print(f"The best value for RSI {target_rsi} is: {round(best_value)}")
-print(f"Latest RSI: {round(data['RSI'].iloc[-1], 1)}")
+print(f"The best value for RSI {target_rsi} is: {best_value}")
+print(f"Latest RSI: {data['RSI'].iloc[-1]}")
 print(f"Latest Time: {data['LocalTime'].iloc[-1]}")
-print(f"Latest Price: {round(data['close'].iloc[-1])}")
-print(f"Difference: {round(best_value - data['close'].iloc[-1])}")
+print(f"Latest Price: {data['close'].iloc[-1]}")
+print(f"Difference between Latest Price and Best Value: {data['close'].iloc[-1] - best_value}")
 
 # Capture the output
 output = new_stdout.getvalue()
@@ -136,36 +140,8 @@ output = new_stdout.getvalue()
 # Reset the standard output to original
 sys.stdout = old_stdout
 
-# Telegram bot command handler for /run
-async def fetch_and_send_data(update, context):
-    message = f"""
-    The best value for RSI {target_rsi} is: {round(best_value, 0)}
-    Latest RSI: {round(data['RSI'].iloc[-1], 1)}
-    Latest Time: {data['LocalTime'].iloc[-1]}
-    Latest Price: {round(data['close'].iloc[-1], 0)}
-    Difference: {round(best_value - data['close'].iloc[-1], 0)}
-    """
-    send_message(message)
-
-# Main function to set up the bot
-def main():
-    try:
-        # Set up the Application instance
-        application = Application.builder().token(TELEGRAM_API_TOKEN).build()
-
-        # Register the /run command
-        application.add_handler(CommandHandler("run", fetch_and_send_data))
-
-        # Start polling
-        application.run_polling()
-
-    except telegram.error.Conflict:
-        print("Error: Another instance of the bot is running.")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-
-if __name__ == '__main__':
-    main()
+# Send the captured output to Telegram
+asyncio.run(send_message(output))
 
 
 
