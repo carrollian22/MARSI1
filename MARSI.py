@@ -22,13 +22,8 @@ bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
 async def send_message(message):
     await bot.send_message(chat_id=CHAT_ID, text=message)
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tv = TvDatafeed()
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Data and Feature Engineering
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 
 # List of coins
 coins = ['BTC', 'ETH', 'LINK', 'DOGE', 'ICP']
@@ -56,15 +51,13 @@ for coin in coins:
 
     # Fetch data
     data = tv.get_hist(symbol=symbol, exchange='MEXC', interval=Interval.in_15_minute, n_bars=5000)
-    
+
     if data is not None:
         # Process the data
         data.reset_index(inplace=True)
         data['datetime'] = pd.to_datetime(data['datetime']).dt.tz_localize(None)
 
         # Feature Engineering
-        data['EMA'] = data['close'].ewm(span=20, adjust=False).mean()
-        data['EMAResult'] = data.apply(lambda row: 1 if row['open'] > row['EMA'] else 0, axis=1)
         data['SMA'] = data['open'].rolling(window=192).mean()
         data['SMASlope'] = (data['SMA'] - data['SMA'].shift(8)) / 8
         data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 3 else (-1 if x < -3 else 0))
@@ -80,41 +73,49 @@ for coin in coins:
         rs = avg_gain / avg_loss
         data['RSI'] = 100 - (100 / (1 + rs))
 
-        # Add additional features
-        data['Change'] = ((data['close'] - data['open']) / data['open']) * 100
-        data['Result'] = data['Change'].apply(lambda x: 1 if x > 0 else 0)
-        
         # Calculate the best RSI value
         last_15_open_values = data['open'].iloc[-100:].values
         last_open = last_15_open_values[-1]
 
-        if data['SMASlopeResult'].iloc[-1] > 0:
+        target_rsi = None
+
+        if data['SMASlopeResult'].iloc[-1] == 1:
             range_start = last_open * 0.92
-            range_end = last_open * 1.02
+            range_end = last_open
             target_rsi = 32.5
+
+        elif data['SMASlopeResult'].iloc[-1] == 0:
+            target_rsi = None
+
         else:
             range_start = last_open * 0.98
             range_end = last_open * 1.08
-            target_rsi = 67.5
+            target_rsi = 70
 
-        range_of_values = np.linspace(range_start, range_end, 500)
-        best_value = None
-        min_diff = float('inf')
+        # Skip processing if target_rsi is None
+        if target_rsi is not None:
+            range_of_values = np.linspace(range_start, range_end, 400)
+            best_value = None
+            min_diff = float('inf')
 
-        for value in range_of_values:
-            rsi_calculated = calculate_rsi_with_16th_value(last_15_open_values, value)
-            diff = abs(rsi_calculated - target_rsi)
-            if diff < min_diff:
-                min_diff = diff
-                best_value = value
+            for value in range_of_values:
+                rsi_calculated = calculate_rsi_with_16th_value(last_15_open_values, value)
+                diff = abs(rsi_calculated - target_rsi)
+                if diff < min_diff:
+                    min_diff = diff
+                    best_value = value
 
         # Add summary data for this coin
         coin_summary.append({
             'Coin': coin,
             'RSI': round(data['RSI'].iloc[-1],0),
             'TGT RSI': target_rsi,
-            'Best Val': round(best_value, 3)          
+            'Best Val': round(best_value, 3)
         })
+                # Print the last 5 rows of data for ETH
+        #if coin == 'ETH':
+            #print(f"Last 5 rows of data for {coin}:")
+            #print(data.tail(5))
     else:
         print(f"No data retrieved for {symbol}. Skipping.\n")
 
@@ -122,19 +123,12 @@ for coin in coins:
 coin_summary_df = pd.DataFrame(coin_summary)
 coin_summary_df = coin_summary_df.sort_values(by='RSI', ascending=False)
 
-# Initialize a StringIO object to capture output
-new_stdout = io.StringIO()
-
-# Redirect standard output to the StringIO object
-old_stdout = sys.stdout
-sys.stdout = new_stdout
-
 # Display the summary dataframe
 # Print the most recent datetime for the current coin
 print(f"Most Recent Datetime: {data['datetime'].iloc[-1]}")
 print()
-print(coin_summary_df.to_string(index=False))
-
+print(coin_summary_df)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Capture the output
 output = new_stdout.getvalue()
 
