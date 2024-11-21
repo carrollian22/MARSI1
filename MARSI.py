@@ -21,23 +21,13 @@ bot = telegram.Bot(token=TELEGRAM_API_TOKEN)
 async def send_message(message):
     await bot.send_message(chat_id=CHAT_ID, text=message)
 
-from tvDatafeed import TvDatafeed, Interval
-
 tv = TvDatafeed()
-
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Data and Feature Engineering
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-import yfinance as yf
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-from datetime import timedelta
-import pytz
+
 
 # List of coins
 coins = ['BTC', 'ETH', 'LINK', 'DOGE', 'ICP']
