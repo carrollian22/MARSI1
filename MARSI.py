@@ -112,7 +112,7 @@ for coin in coins:
         coin_summary.append({
             'Coin Name': coin,
             'RSI': round(data['RSI'].iloc[-1],0),
-            'Price': round(data['RSI'].iloc[-1],0),
+            'Price': round(data['close'].iloc[-1],0),
             'best_value': round(best_value, 0)
         })
     else:
