@@ -90,14 +90,14 @@ for coin in coins:
 
         if data['SMASlopeResult'].iloc[-1] > 0:
             range_start = last_open * 0.92
-            range_end = last_open
+            range_end = last_open * 1.02
             target_rsi = 32.5
         else:
             range_start = last_open * 0.98
             range_end = last_open * 1.08
             target_rsi = 67.5
 
-        range_of_values = np.linspace(range_start, range_end, 400)
+        range_of_values = np.linspace(range_start, range_end, 500)
         best_value = None
         min_diff = float('inf')
 
