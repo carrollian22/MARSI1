@@ -142,15 +142,14 @@ for value in range_of_values:
         min_diff = diff
         best_value = value
 
-# Add summary data for this coin, including target RSI
-coin_summary.append({
-    'Coin Name': coin,
-    'Current RSI': data['RSI'].iloc[-1],
-    'Best Value': best_value,
-    'Target RSI': target_rsi  # Add the target RSI to the summary
-})
-else:
-    print(f"No data retrieved for {symbol}. Skipping.\n")
+        # Add summary data for this coin
+        coin_summary.append({
+            'Coin Name': coin,
+            'Current RSI': data['RSI'].iloc[-1],
+            'best_value': best_value
+        })
+    else:
+        print(f"No data retrieved for {symbol}. Skipping.\n")
 
 # Create a summary dataframe
 coin_summary_df = pd.DataFrame(coin_summary)
