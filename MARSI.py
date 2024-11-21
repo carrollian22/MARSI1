@@ -148,9 +148,9 @@ coin_summary.append({
     'Current RSI': data['RSI'].iloc[-1],
     'Target RSI': target_rsi,
     'Best Value': best_value
-    })
-    else:
-        print(f"No data retrieved for {symbol}. Skipping.\n")
+})
+else:
+    print(f"No data retrieved for {symbol}. Skipping.\n")
 
 # Create a summary dataframe
 coin_summary_df = pd.DataFrame(coin_summary)
