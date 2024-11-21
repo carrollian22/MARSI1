@@ -128,7 +128,22 @@ coin_summary_df = coin_summary_df.sort_values(by='RSI', ascending=False)
 print(f"Most Recent Datetime: {data['datetime'].iloc[-1]}")
 print()
 print(coin_summary_df)
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Initialize a StringIO object to capture output
+new_stdout = io.StringIO()
+
+# Redirect standard output to the StringIO object
+old_stdout = sys.stdout
+sys.stdout = new_stdout
+
+# Display the summary dataframe
+# Print the most recent datetime for the current coin
+print(f"Most Recent Datetime: {data['datetime'].iloc[-1]}")
+print()
+print(coin_summary_df.to_string(index=False))
+
 # Capture the output
 output = new_stdout.getvalue()
 
