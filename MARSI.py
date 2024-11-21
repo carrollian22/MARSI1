@@ -120,6 +120,7 @@ for coin in coins:
 
 # Create a summary dataframe
 coin_summary_df = pd.DataFrame(coin_summary)
+coin_summary_df = coin_summary_df.sort_values(by='RSI', ascending=False)
 
 # Initialize a StringIO object to capture output
 new_stdout = io.StringIO()
