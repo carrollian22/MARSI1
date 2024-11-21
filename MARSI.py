@@ -112,7 +112,42 @@ for coin in coins:
         coin_summary.append({
             'Coin Name': coin,
             'Current RSI': data['RSI'].iloc[-1],
-            'best_value': best_value
+            
+To include the target_rsi in the coin summary, you can simply add the target_rsi value to the dictionary appended to the coin_summary. Here's the updated code:
+
+Updated Code:
+python
+Copy code
+# Calculate the best RSI value
+last_15_open_values = data['open'].iloc[-100:].values
+last_open = last_15_open_values[-1]
+
+if data['SMASlopeResult'].iloc[-1] > 0:
+    range_start = last_open * 0.92
+    range_end = last_open
+    target_rsi = 32.5
+else:
+    range_start = last_open * 0.98
+    range_end = last_open * 1.08
+    target_rsi = 67.5
+
+range_of_values = np.linspace(range_start, range_end, 400)
+best_value = None
+min_diff = float('inf')
+
+for value in range_of_values:
+    rsi_calculated = calculate_rsi_with_16th_value(last_15_open_values, value)
+    diff = abs(rsi_calculated - target_rsi)
+    if diff < min_diff:
+        min_diff = diff
+        best_value = value
+
+# Add summary data for this coin, including target RSI
+coin_summary.append({
+    'Coin Name': coin,
+    'Current RSI': data['RSI'].iloc[-1],
+    'Target RSI': target_rsi,
+    'Best Value': best_value
         })
     else:
         print(f"No data retrieved for {symbol}. Skipping.\n")
