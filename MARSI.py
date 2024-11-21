@@ -10,6 +10,7 @@ import pytz
 import sys
 from io import StringIO
 import asyncio
+import io
 
 # Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
