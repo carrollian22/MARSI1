@@ -105,12 +105,12 @@ for coin in coins:
                     min_diff = diff
                     best_value = value
 
-        # Add summary data for this coin
-        coin_summary.append({
-            'Coin': coin,
-            'RSI': round(data['RSI'].iloc[-1],0),
-            'TGT RSI': target_rsi,
-            'Best Val': round(best_value, 3)
+            # Add summary data for this coin
+            coin_summary.append({
+                'Coin': coin,
+                'RSI': round(data['RSI'].iloc[-1],0),
+                'TGT RSI': target_rsi,
+                'Best Val': round(best_value, 3)
         })
                 # Print the last 5 rows of data for ETH
         #if coin == 'ETH':
