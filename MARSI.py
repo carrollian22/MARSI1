@@ -113,7 +113,8 @@ for coin in coins:
             'Coin Name': coin,
             'RSI': round(data['RSI'].iloc[-1],0),
             'Price': round(data['close'].iloc[-1],2),
-            'best_value': round(best_value, 3)
+            'best_value': round(best_value, 3),
+            'TRGT RSI': target_rsi
         })
     else:
         print(f"No data retrieved for {symbol}. Skipping.\n")
