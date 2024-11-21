@@ -111,8 +111,9 @@ for coin in coins:
         # Add summary data for this coin
         coin_summary.append({
             'Coin Name': coin,
-            'Current RSI': data['RSI'].iloc[-1],
-            'best_value': best_value
+            'RSI': round(data['RSI'].iloc[-1],0),
+            'Price': round(data['RSI'].iloc[-1],0),
+            'best_value': round(best_value, 0)
         })
     else:
         print(f"No data retrieved for {symbol}. Skipping.\n")
