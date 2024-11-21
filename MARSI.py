@@ -146,8 +146,8 @@ for value in range_of_values:
 coin_summary.append({
     'Coin Name': coin,
     'Current RSI': data['RSI'].iloc[-1],
-    'Target RSI': target_rsi,
-    'Best Value': best_value
+    'Best Value': best_value,
+    'Target RSI': target_rsi  # Add the target RSI to the summary
 })
 else:
     print(f"No data retrieved for {symbol}. Skipping.\n")
