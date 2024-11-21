@@ -110,11 +110,11 @@ for coin in coins:
 
         # Add summary data for this coin
         coin_summary.append({
-            'Coin Name': coin,
+            'Coin': coin,
             'RSI': round(data['RSI'].iloc[-1],0),
             'Price': round(data['close'].iloc[-1],2),
-            'best_value': round(best_value, 3),
-            'TRGT RSI': target_rsi
+            'Best Val': round(best_value, 3),
+            'TGT RSI': target_rsi
         })
     else:
         print(f"No data retrieved for {symbol}. Skipping.\n")
@@ -133,7 +133,7 @@ sys.stdout = new_stdout
 # Print the most recent datetime for the current coin
 print(f"Most Recent Datetime: {data['datetime'].iloc[-1]}")
 print()
-print(coin_summary_df)
+print(coin_summary_df.to_string(index=False))
 
 # Capture the output
 output = new_stdout.getvalue()
