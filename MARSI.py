@@ -26,7 +26,7 @@ async def send_message(message):
 tv = TvDatafeed()
 
 # List of coins
-coins = ['BTC', 'ETH', 'LINK', 'DOGE', 'ICP']
+coins = ['BTC', 'ETH', 'SOL', 'SUI', 'ADA', 'AVAX', 'LINK', 'DOT', 'UNI', 'DOGE', 'ICP']
 
 # List to store summary data for each coin
 coin_summary = []
