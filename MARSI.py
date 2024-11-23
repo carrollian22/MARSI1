@@ -60,7 +60,7 @@ for coin in coins:
         # Feature Engineering
         data['SMA'] = data['open'].rolling(window=192).mean()
         data['SMASlope'] = (data['SMA'] - data['SMA'].shift(8)) / 8
-        data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 0.25 else (-1 if x < -0.25 else 0))
+        data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
         data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(8)) / data['SMA'].shift(8)) * 25
 
         # RSI Calculation
