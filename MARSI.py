@@ -119,7 +119,7 @@ for coin in coins:
 
 # Create a summary dataframe
 coin_summary_df = pd.DataFrame(coin_summary)
-coin_summary_df = coin_summary_df.sort_values(by=['TGT RSI', 'RSI'], ascending=[True, False])
+coin_summary_df = coin_summary_df.sort_values(by=['TGT RSI', 'RSI'], ascending=[False, False])
 
 # Display the summary dataframe
 # Print the most recent datetime for the current coin
