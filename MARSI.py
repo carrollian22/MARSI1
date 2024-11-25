@@ -79,18 +79,16 @@ for coin in coins:
 
         target_rsi = None
 
-        if data['SMASlopeResult'].iloc[-1] == 1:
+        if data['SMASlopeResult'].iloc[-1] > 0:
+            # Range is 0% to -4% from last_open and target RSI is 30
             range_start = last_open * 0.92
             range_end = last_open
             target_rsi = 32.5
-
-        elif data['SMASlopeResult'].iloc[-1] == 0:
-            target_rsi = None
-
         else:
-            range_start = last_open * 0.98
+            # Range is 0% to +4% from last_open and target RSI is 70
+            range_start = last_open
             range_end = last_open * 1.08
-            target_rsi = 70
+            target_rsi = 67.5
 
         # Skip processing if target_rsi is None
         if target_rsi is not None:
@@ -105,15 +103,15 @@ for coin in coins:
                     min_diff = diff
                     best_value = value
 
-            # Add summary data for this coin
+                # Add summary data for this coin
             coin_summary.append({
                 'Coin': coin,
                 'RSI': round(data['RSI'].iloc[-1],0),
                 'TGT RSI': target_rsi,
                 'Best Val': round(best_value, 3)
-        })
-                # Print the last 5 rows of data for ETH
-        #if coin == 'ETH':
+            })
+                    # Print the last 5 rows of data for ETH
+        #if coin == 'AVAX':
             #print(f"Last 5 rows of data for {coin}:")
             #print(data.tail(5))
     else:
