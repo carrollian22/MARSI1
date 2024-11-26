@@ -160,7 +160,7 @@ def trigger_github_workflow():
 
     # Headers for authentication
     headers = {
-        "Authorization": "Bearer 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",  # Replace with your GitHub token
+        "Authorization": "Bearer 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",  # Replace with your GitHub token
         "Accept": "application/vnd.github.v3+json"
     }
 
