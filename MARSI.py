@@ -79,13 +79,12 @@ for coin in coins:
 
         target_rsi = None
 
-        if data['SMASlopeResult'].iloc[-1] > 0:
-            # Range is 0% to -4% from last_open and target RSI is 30
+        if data['SMASlopeP'].iloc[-1] > 0:
             range_start = last_open * 0.92
             range_end = last_open
             target_rsi = 32.5
-        else:
-            # Range is 0% to +4% from last_open and target RSI is 70
+
+        elif data['SMASlopeP'].iloc[-1] < 0:
             range_start = last_open
             range_end = last_open * 1.08
             target_rsi = 67.5
