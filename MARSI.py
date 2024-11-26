@@ -11,6 +11,7 @@ import sys
 from io import StringIO
 import asyncio
 import io
+import requests
 
 # Initialize Telegram Bot
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Get the Telegram API Token from environment variables
@@ -149,6 +150,38 @@ sys.stdout = old_stdout
 
 # Send the captured output to Telegram
 asyncio.run(send_message(output))
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Function to trigger GitHub workflow
+def trigger_github_workflow():
+    # GitHub API URL to trigger the workflow dispatch
+    url = "https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME/actions/workflows/marsibot.yml/dispatches"
+
+    # Headers for authentication
+    headers = {
+        "Authorization": "Bearer YOUR_GITHUB_TOKEN",  # Replace with your GitHub token
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # Payload for triggering the workflow (Optional ref: specify a branch like "main")
+    payload = {
+        "ref": "main"  # This is the branch you want to trigger the workflow for
+    }
+
+    # Make the POST request to trigger the workflow
+    response = requests.post(url, headers=headers, json=payload)
+
+    # Check if the request was successful
+    if response.status_code == 201:
+        print("Workflow triggered successfully.")
+    else:
+        print(f"Failed to trigger workflow: {response.status_code}")
+        print(response.text)
+
+# Trigger GitHub workflow after the script completes
+trigger_github_workflow()
+
 
 
 
