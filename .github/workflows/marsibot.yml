@@ -1,7 +1,11 @@
 name: Run MARSI Bot
+name: Run MARSI Bot
 
 on:
-  workflow_dispatch: # Allows manual or webhook-triggered runs
+  schedule:
+    # Runs every 15 minutes
+    - cron: "*/15 * * * *"
+  workflow_dispatch: # Allows manual runs
 
 jobs:
   run-bot:
@@ -23,7 +27,6 @@ jobs:
         run: |
           pip install pandas numpy scikit-learn matplotlib pytz
           pip install python-telegram-bot
-          pip install requests
           pip install --upgrade --no-cache-dir git+https://github.com/rongardF/tvdatafeed.git
 
       # Step 4: Run the script
