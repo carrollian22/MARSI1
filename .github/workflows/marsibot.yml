@@ -1,5 +1,4 @@
 name: Run MARSI Bot
-name: Run MARSI Bot
 
 on:
   schedule:
