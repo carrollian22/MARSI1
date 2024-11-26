@@ -156,11 +156,11 @@ asyncio.run(send_message(output))
 # Function to trigger GitHub workflow
 def trigger_github_workflow():
     # GitHub API URL to trigger the workflow dispatch
-    url = "https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME/actions/workflows/marsibot.yml/dispatches"
+    url = "https://api.github.com/repos/carrollian22/MARSI1/actions/workflows/marsibot.yml/dispatches"
 
     # Headers for authentication
     headers = {
-        "Authorization": "Bearer YOUR_GITHUB_TOKEN",  # Replace with your GitHub token
+        "Authorization": "Bearer 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",  # Replace with your GitHub token
         "Accept": "application/vnd.github.v3+json"
     }
 
