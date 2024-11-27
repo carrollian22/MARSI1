@@ -59,9 +59,10 @@ for coin in coins:
 
         # Feature Engineering
         data['SMA'] = data['open'].rolling(window=192).mean()
-        data['SMASlope'] = (data['SMA'] - data['SMA'].shift(8)) / 8
+        data['SMASlope'] = (data['SMA'] - data['SMA'].shift(40)) / 40
         data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
-        data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(8)) / data['SMA'].shift(8)) * 25
+        data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(24)) / data['SMA'].shift(24)) * 100
+        data['SMASlopePResult'] = data['SMASlopeP'].apply(lambda x: 1 if x > 0.2 else (-1 if x < -0.2 else 0))
 
         # RSI Calculation
         window_length = 16
@@ -79,15 +80,15 @@ for coin in coins:
 
         target_rsi = None
 
-        if data['SMASlopeP'].iloc[-1] > 0:
+        if data['SMASlopePResult'].iloc[-1] > 0:
             range_start = last_open * 0.92
             range_end = last_open
             target_rsi = 32.5
 
-        elif data['SMASlopeP'].iloc[-1] < 0:
+        elif data['SMASlopePResult'].iloc[-1] < 0:
             range_start = last_open
             range_end = last_open * 1.08
-            target_rsi = 67.5
+            target_rsi = 72.5
 
         # Skip processing if target_rsi is None
         if target_rsi is not None:
@@ -110,7 +111,7 @@ for coin in coins:
                 'Best Val': round(best_value, 3)
             })
                     # Print the last 5 rows of data for ETH
-        #if coin == 'AVAX':
+        #if coin == 'BTC':
             #print(f"Last 5 rows of data for {coin}:")
             #print(data.tail(5))
     else:
