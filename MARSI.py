@@ -61,7 +61,7 @@ for coin in coins:
         data['SMA'] = data['open'].rolling(window=192).mean()
         data['SMASlope'] = (data['SMA'] - data['SMA'].shift(40)) / 40
         data['SMASlopeResult'] = data['SMASlope'].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
-        data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(24)) / data['SMA'].shift(24)) * 100
+        data['SMASlopeP'] = ((data['SMA'] - data['SMA'].shift(36)) / data['SMA'].shift(36)) * 100
         data['SMASlopePResult'] = data['SMASlopeP'].apply(lambda x: 1 if x > 0.2 else (-1 if x < -0.2 else 0))
 
         # RSI Calculation
