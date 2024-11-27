@@ -88,7 +88,7 @@ for coin in coins:
         elif data['SMASlopePResult'].iloc[-1] < 0:
             range_start = last_open
             range_end = last_open * 1.08
-            target_rsi = 72.5
+            target_rsi = 67.5
 
         # Skip processing if target_rsi is None
         if target_rsi is not None:
