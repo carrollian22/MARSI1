@@ -1,0 +1,7 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+pytz
+python-telegram-bot==20.0
+git+https://github.com/rongardF/tvdatafeed
