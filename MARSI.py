@@ -44,6 +44,9 @@ def calculate_rsi_with_16th_value(last_15_open_values, value, window_length=16):
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
+    local_tz = pytz.timezone("America/New_York")  # Replace with your desired timezone
+    data['LocalTime'] = data['datetime'].apply(lambda dt: pytz.utc.localize(dt).astimezone(local_tz).strftime('%Y-%m-%d %H:%M:%S'))
+    
 # Loop through each coin
 for coin in coins:
     symbol = f'{coin}USDT.P'
@@ -123,7 +126,7 @@ coin_summary_df = coin_summary_df.sort_values(by=['TGT RSI', 'RSI'], ascending=[
 
 # Display the summary dataframe
 # Print the most recent datetime for the current coin
-print(f"Most Recent Datetime: {data['datetime'].iloc[-1]}")
+print(f"Most Recent Local Time: {data['LocalTime'].iloc[-1]}")
 print()
 print(coin_summary_df)
 
