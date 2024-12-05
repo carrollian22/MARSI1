@@ -43,9 +43,6 @@ def calculate_rsi_with_16th_value(last_15_open_values, value, window_length=16):
     rs = avg_gain.iloc[-1] / avg_loss.iloc[-1] if avg_loss.iloc[-1] != 0 else np.inf
     rsi = 100 - (100 / (1 + rs))
     return rsi
-
-    local_tz = pytz.timezone("America/New_York")  # Replace with your desired timezone
-    data['LocalTime'] = data['datetime'].apply(lambda dt: pytz.utc.localize(dt).astimezone(local_tz).strftime('%Y-%m-%d %H:%M:%S'))
     
 # Loop through each coin
 for coin in coins:
@@ -76,6 +73,9 @@ for coin in coins:
         avg_loss = loss.ewm(alpha=1/window_length, min_periods=window_length).mean()
         rs = avg_gain / avg_loss
         data['RSI'] = 100 - (100 / (1 + rs))
+
+        local_tz = pytz.timezone("America/New_York")  # Replace with your desired timezone
+        data['LocalTime'] = data['datetime'].apply(lambda dt: pytz.utc.localize(dt).astimezone(local_tz).strftime('%Y-%m-%d %H:%M:%S'))
 
         # Calculate the best RSI value
         last_15_open_values = data['open'].iloc[-100:].values
