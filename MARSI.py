@@ -141,7 +141,7 @@ sys.stdout = new_stdout
 
 # Display the summary dataframe
 # Print the most recent datetime for the current coin
-print(f"Most Recent Datetime: {data['datetime'].iloc[-1]}")
+print(f"Most Recent Local Time: {data['LocalTime'].iloc[-1]}")
 print()
 print(coin_summary_df.to_string(index=False))
 
