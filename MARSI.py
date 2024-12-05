@@ -50,7 +50,7 @@ for coin in coins:
     #print(f"Fetching data for {symbol}...")
 
     # Fetch data
-    data = tv.get_hist(symbol=symbol, exchange='MEXC', interval=Interval.in_15_minute, n_bars=5000)
+    data = tv.get_hist(symbol=symbol, exchange='MEXC', interval=Interval.in_4_hour, n_bars=5000)
 
     if data is not None:
         # Process the data
