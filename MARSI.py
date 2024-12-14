@@ -26,7 +26,8 @@ async def send_message(message):
 tv = TvDatafeed()
 
 # List of coins
-coins = ['BTC', 'ETH', 'SOL', 'SUI', 'ADA', 'AVAX', 'LINK', 'DOT', 'UNI', 'DOGE', 'ICP']
+coins = ['BTC', 'AVAX', 'LINK', 'DOT', 'UNI', 'ICP', 'TIA', 'NEAR', 'APT', 'STX', 'FTM', 'RENDER', 
+         'FET', 'FTM', 'INJ', 'SEI', 'HNT', 'SUSHI', 'WOO', 'XTZ', 'METIS']
 
 # List to store summary data for each coin
 coin_summary = []
@@ -86,7 +87,7 @@ for coin in coins:
         if data['SMASlopePResult'].iloc[-1] > 0:
             range_start = last_open * 0.92
             range_end = last_open
-            target_rsi = 32.5
+            target_rsi = 30
 
         elif data['SMASlopePResult'].iloc[-1] < 0:
             range_start = last_open
