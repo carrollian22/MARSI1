@@ -27,7 +27,7 @@ tv = TvDatafeed()
 
 # List of coins
 coins = ['BTC', 'AVAX', 'LINK', 'DOT', 'UNI', 'ICP', 'TIA', 'NEAR', 'APT', 'STX', 'FTM', 'RENDER', 
-         'FET', 'FTM', 'INJ', 'SEI', 'HNT', 'SUSHI', 'WOO', 'XTZ', 'METIS']
+         'FET', 'INJ', 'SEI', 'HNT', 'SUSHI', 'WOO', 'XTZ', 'METIS']
 
 # List to store summary data for each coin
 coin_summary = []
