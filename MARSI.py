@@ -26,8 +26,7 @@ async def send_message(message):
 tv = TvDatafeed()
 
 # List of coins
-coins = ['BTC', 'AVAX', 'LINK', 'DOT', 'UNI', 'ICP', 'TIA', 'NEAR', 'APT', 'STX', 'FTM', 'RENDER', 
-         'FET', 'INJ', 'SEI', 'HNT', 'SUSHI', 'WOO', 'XTZ', 'METIS']
+coins = ['BTC', 'ETH', 'LINK']
 
 # List to store summary data for each coin
 coin_summary = []
@@ -51,7 +50,7 @@ for coin in coins:
     #print(f"Fetching data for {symbol}...")
 
     # Fetch data
-    data = tv.get_hist(symbol=symbol, exchange='MEXC', interval=Interval.in_4_hour, n_bars=5000)
+    data = tv.get_hist(symbol=symbol, exchange='MEXC', interval=Interval.in_daily, n_bars=5000)
 
     if data is not None:
         # Process the data
@@ -85,14 +84,14 @@ for coin in coins:
         target_rsi = None
 
         if data['SMASlopePResult'].iloc[-1] > 0:
-            range_start = last_open * 0.8
+            range_start = last_open * 0.75
             range_end = last_open
-            target_rsi = 32.5
+            target_rsi = 30
 
         elif data['SMASlopePResult'].iloc[-1] < 0:
-            range_start = last_open * .92
-            range_end = last_open * 1.2
-            target_rsi = 32.5
+            range_start = last_open
+            range_end = last_open * 1.25
+            target_rsi = 70
 
         # Skip processing if target_rsi is None
         if target_rsi is not None:
