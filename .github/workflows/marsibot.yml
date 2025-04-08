@@ -2,8 +2,8 @@ name: Run MARSI Bot
 
 on:
   schedule:
-    # Runs every 15 minutes
-    - cron: "0 */4 * * *"
+    # Runs everyday at 8pm EST
+    - cron: "0 1 * * *"
   workflow_dispatch: # Allows manual runs
 
 jobs:
